@@ -35,9 +35,9 @@ namespace AyuLanka.AMS.BusinessSevices
             _httpClientFactory = httpClientFactory;
         }
 
-        public async Task<IEnumerable<AppointmentSchedule>> GetAllAppointmentSchedulesAsync()
+        public async Task<IEnumerable<AppointmentSchedule>> GetAllAppointmentSchedulesAsync(int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetAllAppointmentSchedulesAsync();
+            return await _appointmentScheduleRepository.GetAllAppointmentSchedulesAsync(companyId);
         }
 
         public async Task<AppointmentSchedule> GetAppointmentScheduleByIdAsync(int id)
@@ -45,49 +45,54 @@ namespace AyuLanka.AMS.BusinessSevices
             return await _appointmentScheduleRepository.GetAppointmentScheduleByIdAsync(id);
         }
         
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateAsync(DateTime date)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateAsync(DateTime date, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetAppointmentScheduleByDateAsync(date);
+            return await _appointmentScheduleRepository.GetAppointmentScheduleByDateAsync(date, companyId);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateAsync(DateTime date)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateAsync(DateTime date, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetPrimeCareAppointmentScheduleByDateAsync(date);
+            return await _appointmentScheduleRepository.GetPrimeCareAppointmentScheduleByDateAsync(date, companyId);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetTokensByDateAsync(DateTime date)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetTokensByDateAsync(DateTime date, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetTokensByDateAsync(date);
+            return await _appointmentScheduleRepository.GetTokensByDateAsync(date, companyId);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetIssuedTokensByDateAsync()
+        public async Task<IEnumerable<AppointmentSchedule?>> GetTokensByDateAndCompanyCodeAsync(DateTime date, string? companyCode = null)
         {
-            return await _appointmentScheduleRepository.GetIssuedTokensByDateAsync();
+            return await _appointmentScheduleRepository.GetTokensByDateAndCompanyCodeAsync(date, companyCode);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetDeletedAppoitmentByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetIssuedTokensByDateAsync(int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetDeletedAppoitmentByDateRangeAsync(startDate, endDate);
+            return await _appointmentScheduleRepository.GetIssuedTokensByDateAsync(companyId);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetCompletedPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetDeletedAppoitmentByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetCompletedPreScheduledAppointmentAsync(startDate, endDate);
+            return await _appointmentScheduleRepository.GetDeletedAppoitmentByDateRangeAsync(startDate, endDate, companyId);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAllPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetCompletedPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetAllPreScheduledAppointmentAsync(startDate, endDate);
+            return await _appointmentScheduleRepository.GetCompletedPreScheduledAppointmentAsync(startDate, endDate, companyId);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAllPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetAppointmentScheduleByDateRangeAsync(startDate, endDate);
+            return await _appointmentScheduleRepository.GetAllPreScheduledAppointmentAsync(startDate, endDate, companyId);
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAllAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetAllAppointmentScheduleByDateRangeAsync(startDate, endDate);
+            return await _appointmentScheduleRepository.GetAppointmentScheduleByDateRangeAsync(startDate, endDate, companyId);
+        }
+
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAllAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        {
+            return await _appointmentScheduleRepository.GetAllAppointmentScheduleByDateRangeAsync(startDate, endDate, companyId);
         }
         public async Task<IEnumerable<DashboardDateChartDto?>> GetAllDashboardChartsDatabyDateRangeAsync(DateTime startDate, DateTime endDate)
         {
@@ -109,7 +114,7 @@ namespace AyuLanka.AMS.BusinessSevices
             return await _appointmentScheduleRepository.GetCustomerDetailsByIdAsync(customerId);
         }
 
-        public async Task<IEnumerable<object>> SearchPatientsAsync(string keyword)
+        public async Task<IEnumerable<object>> SearchPatientsAsync(string keyword, string? companyCode = null)
         {
             if (string.IsNullOrWhiteSpace(keyword))
                 return Enumerable.Empty<object>();
@@ -174,9 +179,19 @@ namespace AyuLanka.AMS.BusinessSevices
         }
 
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _appointmentScheduleRepository.GetPrimeCareAppointmentScheduleByDateRangeAsync(startDate, endDate);
+            return await _appointmentScheduleRepository.GetPrimeCareAppointmentScheduleByDateRangeAsync(startDate, endDate, companyId);
+        }
+
+        public async Task<IEnumerable<AppointmentSchedule>> GetByDoctorSessionIdAsync(int sessionId, int? companyId = null)
+        {
+            return await _appointmentScheduleRepository.GetByDoctorSessionIdAsync(sessionId, companyId);
+        }
+
+        public async Task<IEnumerable<AppointmentSchedule>> GetDoctorChannelingAppointmentsByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        {
+            return await _appointmentScheduleRepository.GetDoctorChannelingAppointmentsByDateRangeAsync(startDate, endDate, companyId);
         }
 
         //public async Task<AppointmentSchedule> AddAppointmentScheduleAsync(AppointmentScheduleRequestModel appointmentScheduleRequestModel)
@@ -284,49 +299,63 @@ namespace AyuLanka.AMS.BusinessSevices
                 if (appointmentScheduleRequestModel.Id == 0)
                 {
                     int location_id;
-                    if (appointmentScheduleRequestModel.MainTreatmentArea.HasValue && appointmentScheduleRequestModel.MainTreatmentArea == 1)
+                    if (appointmentScheduleRequestModel.MainTreatmentArea.HasValue)
                     {
-                        var location = await _locationRepository.GetTreatmentLocationByNameAsync("Doctor Room Waiting");
-                        location_id = location.Id;
-                    }
-                    else
-                    {
-                        if (appointmentScheduleRequestModel.LocationId.HasValue)
+                        if (appointmentScheduleRequestModel.MainTreatmentArea == 1)
                         {
-                            location_id = (int)appointmentScheduleRequestModel.LocationId;
+                            var location = await _locationRepository.GetTreatmentLocationByNameAsync("Doctor Room Waiting", appointmentScheduleRequestModel.CompanyId);
+                            if (location == null)
+                                throw new InvalidOperationException($"Default location 'Doctor Room Waiting' not found for company {appointmentScheduleRequestModel.CompanyId}. Please ensure this location exists.");
+                            location_id = location.Id;
                         }
                         else
                         {
-                            var location = await _locationRepository.GetTreatmentLocationByNameAsync("Elite Care Waiting");
-                            location_id = location.Id;
+                            if (appointmentScheduleRequestModel.LocationId.HasValue)
+                            {
+                                location_id = (int)appointmentScheduleRequestModel.LocationId;
+                            }
+                            else
+                            {
+                                var location = await _locationRepository.GetTreatmentLocationByNameAsync("Elite Care Waiting", appointmentScheduleRequestModel.CompanyId);
+                                if (location == null)
+                                    throw new InvalidOperationException($"Default location 'Elite Care Waiting' not found for company {appointmentScheduleRequestModel.CompanyId}. Please ensure this location exists.");
+                                location_id = location.Id;
+                            }
                         }
+                    } else
+                    {
+                        location_id = appointmentScheduleRequestModel.LocationId.HasValue
+                            ? appointmentScheduleRequestModel.LocationId.Value
+                            : 0;
                     }
 
-                    var newAppointment = new AppointmentSchedule()
-                    {
-                        CustomerId = appointmentScheduleRequestModel.CustomerId,
-                        CustomerName = appointmentScheduleRequestModel.CustomerName,
-                        ContactNo = appointmentScheduleRequestModel.ContactNo,
-                        EmployeeId = appointmentScheduleRequestModel.EmployeeId != 0 ? appointmentScheduleRequestModel.EmployeeId : null,
-                        SecondaryEmployeeId = appointmentScheduleRequestModel.SecondaryEmployeeId != 0 ? appointmentScheduleRequestModel.SecondaryEmployeeId : null,
-                        DoctorEmployeeId = appointmentScheduleRequestModel.DoctorEmployeeId != 0 ? appointmentScheduleRequestModel.DoctorEmployeeId : null,
-                        ScheduleDate = appointmentScheduleRequestModel.ScheduleDate,
-                        LocationId = location_id,
-                        FromTime = appointmentScheduleRequestModel.FromTime,
-                        ToTime = appointmentScheduleRequestModel.ToTime,
-                        ActualFromTime = appointmentScheduleRequestModel.ActualFromTime,
-                        ActualToTime = appointmentScheduleRequestModel.ActualToTime,
-                        ActualFromTimeSecond = appointmentScheduleRequestModel.ActualFromTimeSecond,
-                        ActualToTimeSecond = appointmentScheduleRequestModel.ActualToTimeSecond,
-                        EnteredBy = appointmentScheduleRequestModel.EnteredBy,
-                        Remarks = appointmentScheduleRequestModel.Remarks,
-                        EnteredDate = DateTime.Now,
-                        TokenNo = appointmentScheduleRequestModel.TokenNo,
-                        TokenIssueTime = DateTime.Now,
-                        MainTreatmentArea = appointmentScheduleRequestModel?.MainTreatmentArea,
-                        ParentAppointmentScheduleId = appointmentScheduleRequestModel.ParentAppointmentScheduleId != null ? appointmentScheduleRequestModel.ParentAppointmentScheduleId : null,
-                        IsNeededToFollowUp = appointmentScheduleRequestModel.IsNeededToFollowUp != null ? appointmentScheduleRequestModel.IsNeededToFollowUp : false,
-                    };
+                        var newAppointment = new AppointmentSchedule()
+                        {
+                            CustomerId = appointmentScheduleRequestModel.CustomerId,
+                            CustomerName = appointmentScheduleRequestModel.CustomerName,
+                            ContactNo = appointmentScheduleRequestModel.ContactNo,
+                            EmployeeId = appointmentScheduleRequestModel.EmployeeId != 0 ? appointmentScheduleRequestModel.EmployeeId : null,
+                            SecondaryEmployeeId = appointmentScheduleRequestModel.SecondaryEmployeeId != 0 ? appointmentScheduleRequestModel.SecondaryEmployeeId : null,
+                            DoctorEmployeeId = appointmentScheduleRequestModel.DoctorEmployeeId != 0 ? appointmentScheduleRequestModel.DoctorEmployeeId : null,
+                            ScheduleDate = appointmentScheduleRequestModel.ScheduleDate,
+                            LocationId = location_id == 0 ? null : location_id,
+                            FromTime = appointmentScheduleRequestModel.FromTime,
+                            ToTime = appointmentScheduleRequestModel.ToTime,
+                            ActualFromTime = appointmentScheduleRequestModel.ActualFromTime,
+                            ActualToTime = appointmentScheduleRequestModel.ActualToTime,
+                            ActualFromTimeSecond = appointmentScheduleRequestModel.ActualFromTimeSecond,
+                            ActualToTimeSecond = appointmentScheduleRequestModel.ActualToTimeSecond,
+                            EnteredBy = appointmentScheduleRequestModel.EnteredBy,
+                            Remarks = appointmentScheduleRequestModel.Remarks,
+                            EnteredDate = DateTime.Now,
+                            TokenNo = appointmentScheduleRequestModel.TokenNo,
+                            TokenIssueTime = DateTime.Now,
+                            MainTreatmentArea = appointmentScheduleRequestModel?.MainTreatmentArea,
+                            ParentAppointmentScheduleId = appointmentScheduleRequestModel.ParentAppointmentScheduleId != null ? appointmentScheduleRequestModel.ParentAppointmentScheduleId : null,
+                            IsNeededToFollowUp = appointmentScheduleRequestModel.IsNeededToFollowUp != null ? appointmentScheduleRequestModel.IsNeededToFollowUp : false,
+                            CompanyId = appointmentScheduleRequestModel.CompanyId,
+                            DoctorSessionId = appointmentScheduleRequestModel.DoctorSessionId,
+                        };
 
                     appointmentResult = await _appointmentScheduleRepository.AddAppointmentScheduleAsync(newAppointment);
                 }
@@ -335,33 +364,49 @@ namespace AyuLanka.AMS.BusinessSevices
                     var existingAppointment = await _appointmentScheduleRepository.GetAppointmentScheduleByIdAsync(appointmentScheduleRequestModel.Id);
 
                     int location_id;
-                    if (appointmentScheduleRequestModel.MainTreatmentArea.HasValue && appointmentScheduleRequestModel.MainTreatmentArea == 1)
+                    if (appointmentScheduleRequestModel.MainTreatmentArea.HasValue)
                     {
-                        if (appointmentScheduleRequestModel.LocationId.HasValue)
+                        if (appointmentScheduleRequestModel.MainTreatmentArea == 1)
                         {
-                            location_id = (int)appointmentScheduleRequestModel.LocationId;
+                            if (appointmentScheduleRequestModel.LocationId.HasValue)
+                            {
+                                location_id = (int)appointmentScheduleRequestModel.LocationId;
+                            }
+                            else
+                            {
+                                var location = await _locationRepository.GetTreatmentLocationByNameAsync("Doctor Room Waiting", appointmentScheduleRequestModel.CompanyId);
+                                if (location == null)
+                                    throw new InvalidOperationException($"Default location 'Doctor Room Waiting' not found for company {appointmentScheduleRequestModel.CompanyId}. Please ensure this location exists.");
+                                location_id = location.Id;
+                            }
                         }
                         else
                         {
-                            var location = await _locationRepository.GetTreatmentLocationByNameAsync("Doctor Room Waiting");
-                            location_id = location.Id;
+                            if (appointmentScheduleRequestModel.LocationId.HasValue)
+                            {
+                                location_id = (int)appointmentScheduleRequestModel.LocationId;
+                            }
+                            else
+                            {
+                                var location = await _locationRepository.GetTreatmentLocationByNameAsync("Elite Care Waiting", appointmentScheduleRequestModel.CompanyId);
+                                if (location == null)
+                                    throw new InvalidOperationException($"Default location 'Elite Care Waiting' not found for company {appointmentScheduleRequestModel.CompanyId}. Please ensure this location exists.");
+                                location_id = location.Id;
+                            }
                         }
                     }
                     else
                     {
-                        if (appointmentScheduleRequestModel.LocationId.HasValue)
-                        {
-                            location_id = (int)appointmentScheduleRequestModel.LocationId;
-                        }
-                        else
-                        {
-                            var location = await _locationRepository.GetTreatmentLocationByNameAsync("Elite Care Waiting");
-                            location_id = location.Id;
-                        }
+                        // No MainTreatmentArea sent (e.g. drag-and-drop from scheduler) —
+                        // use the LocationId directly if provided, otherwise leave unchanged.
+                        location_id = appointmentScheduleRequestModel.LocationId.HasValue
+                            ? appointmentScheduleRequestModel.LocationId.Value
+                            : (existingAppointment.LocationId ?? 0);
                     }
 
-                    existingAppointment.CustomerId = appointmentScheduleRequestModel.CustomerId != 0 ?
-                                                    appointmentScheduleRequestModel.CustomerId : existingAppointment.CustomerId;
+
+                        existingAppointment.CustomerId = appointmentScheduleRequestModel.CustomerId != 0 ?
+                                                        appointmentScheduleRequestModel.CustomerId : existingAppointment.CustomerId;
                     existingAppointment.CustomerName = appointmentScheduleRequestModel.CustomerName;
                     existingAppointment.ContactNo = appointmentScheduleRequestModel.ContactNo;
                     existingAppointment.EmployeeId = appointmentScheduleRequestModel.EmployeeId != 0
@@ -371,7 +416,7 @@ namespace AyuLanka.AMS.BusinessSevices
                     existingAppointment.DoctorEmployeeId = appointmentScheduleRequestModel.DoctorEmployeeId != 0
                                                     ? appointmentScheduleRequestModel.DoctorEmployeeId : null;
                     existingAppointment.ScheduleDate = appointmentScheduleRequestModel.ScheduleDate;
-                    existingAppointment.LocationId = location_id;
+                    existingAppointment.LocationId = location_id == 0 ? null : location_id;
                     existingAppointment.FromTime = appointmentScheduleRequestModel.FromTime;
                     existingAppointment.ToTime = appointmentScheduleRequestModel.ToTime;
                     existingAppointment.ActualFromTime = appointmentScheduleRequestModel.ActualFromTime;
@@ -395,7 +440,7 @@ namespace AyuLanka.AMS.BusinessSevices
                     {
                         if (existingAppointment.ChitNo == null)
                         {
-                            var maxChitNo = await _appointmentScheduleRepository.GetMaxChitNoAsync(appointmentScheduleRequestModel.ScheduleDate);
+                            var maxChitNo = await _appointmentScheduleRepository.GetMaxChitNoAsync(appointmentScheduleRequestModel.ScheduleDate, appointmentScheduleRequestModel.CompanyId);
                             existingAppointment.ChitNo = maxChitNo + 1;
                         }
                     }
@@ -411,7 +456,9 @@ namespace AyuLanka.AMS.BusinessSevices
                     appointmentResult.EnteredByEmployee = enterdByUser;
 
                     var locationSub = appointmentResult.Location != null ? appointmentResult.Location
-                        : await _locationRepository.GetLocationByLocationIdAsync((int)appointmentResult.LocationId);
+                        : (appointmentResult.LocationId.HasValue
+                            ? await _locationRepository.GetLocationByLocationIdAsync(appointmentResult.LocationId.Value)
+                            : null);
 
                     if (locationSub != null)
                     {
@@ -428,7 +475,11 @@ namespace AyuLanka.AMS.BusinessSevices
                                 customerName = $"{appointmentResult.CustomerName} - Appt: {appointmentResult.FromTime:hh\\:mm\\:ss}";
                             }
 
-                            await InsertOrUpdateDailyTokenAsync(appointmentResult, locationSub, locationTypeName, customerName);
+                            // Only sync to the daily token display board for the Wattala branch (CompanyId = 1)
+                            if (appointmentResult.CompanyId == 1)
+                            {
+                                await InsertOrUpdateDailyTokenAsync(appointmentResult, locationSub, locationTypeName, customerName);
+                            }
                         }
                     }
                 }

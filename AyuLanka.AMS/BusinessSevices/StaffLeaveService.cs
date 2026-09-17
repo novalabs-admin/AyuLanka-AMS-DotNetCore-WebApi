@@ -19,9 +19,9 @@ namespace AyuLanka.AMS.BusinessSevices
             return await _staffLeaveRepository.GetStaffLeavesByDateAsync(date);
         }
 
-        public async Task<IEnumerable<StaffLeave>> GetAllStaffLeavesAsync()
+        public async Task<IEnumerable<StaffLeave>> GetAllStaffLeavesAsync(int? companyId = null)
         {
-            return await _staffLeaveRepository.GetAllStaffLeavesAsync();
+            return await _staffLeaveRepository.GetAllStaffLeavesAsync(companyId);
         }
 
         public async Task<StaffLeave> GetStaffLeaveByIdAsync(int id)
@@ -68,9 +68,9 @@ namespace AyuLanka.AMS.BusinessSevices
             await _staffLeaveRepository.DeleteStaffLeaveAsync(id);
         }
 
-        public async Task<IEnumerable<StaffLeave>> GetStaffLeavesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<StaffLeave>> GetStaffLeavesByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _staffLeaveRepository.GetStaffLeavesByDateRangeAsync(startDate, endDate);
+            return await _staffLeaveRepository.GetStaffLeavesByDateRangeAsync(startDate, endDate, companyId);
         }
     }
 }

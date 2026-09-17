@@ -17,9 +17,9 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DayOffChangeDetail>>> GetAllDayOffChangeDeatils()
+        public async Task<ActionResult<IEnumerable<DayOffChangeDetail>>> GetAllDayOffChangeDeatils([FromQuery] int? companyId = null)
         {
-            var DayOffChangeMasters = await _dayOffChangeMasterService.GetAllDayOffChangeDetailsAsync();
+            var DayOffChangeMasters = await _dayOffChangeMasterService.GetAllDayOffChangeDetailsAsync(companyId);
             return Ok(DayOffChangeMasters);
         }
 

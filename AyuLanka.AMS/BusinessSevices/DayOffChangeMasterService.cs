@@ -20,9 +20,9 @@ namespace AyuLanka.AMS.BusinessSevices
             _staffRosterRepository = staffRosterRepository;
         }
 
-        public async Task<IEnumerable<DayOffChangeDetail>> GetAllDayOffChangeDetailsAsync()
+        public async Task<IEnumerable<DayOffChangeDetail>> GetAllDayOffChangeDetailsAsync(int? companyId = null)
         {
-            return await _dayOffChangeDetailRepository.GetAllDayOffChangeDetailsAsync();
+            return await _dayOffChangeDetailRepository.GetAllDayOffChangeDetailsAsync(companyId);
         }
 
         public async Task<DayOffChangeMaster> GetDayOffChangeMasterByIdAsync(int id)

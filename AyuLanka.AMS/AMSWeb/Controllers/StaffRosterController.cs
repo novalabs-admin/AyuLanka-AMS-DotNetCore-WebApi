@@ -32,11 +32,11 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("dates")]
-        public async Task<IActionResult> GetRosterDates()
+        public async Task<IActionResult> GetRosterDates([FromQuery] int? companyId = null)
         {
             try
             {
-                var dates = await _staffRosterService.GetRosterDateRangesAsync();
+                var dates = await _staffRosterService.GetRosterDateRangesAsync(companyId);
                 return Ok(dates.Select(d => new
                 {
                     Id = d.Id,

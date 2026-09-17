@@ -14,9 +14,9 @@ namespace AyuLanka.AMS.BusinessSevices
             _employeeRepository = employeeRepository;
         }
 
-        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync(int? companyId = null)
         {
-            return await _employeeRepository.GetAllEmployeesAsync();
+            return await _employeeRepository.GetAllEmployeesAsync(companyId);
         }
 
         public async Task<Employee> GetEmployeeByIdAsync(int id)
@@ -39,7 +39,8 @@ namespace AyuLanka.AMS.BusinessSevices
                 NIC = employeeRequestModel.NIC,
                 ShiftMasterId = employeeRequestModel.ShiftMasterId,
                 Username = employeeRequestModel.Username,
-                Password = password
+                Password = password,
+                CompanyId = employeeRequestModel.CompanyId
             };
             return await _employeeRepository.AddEmployeeAsync(employee);
         }
@@ -89,6 +90,12 @@ namespace AyuLanka.AMS.BusinessSevices
                 return user;
             }
             return null;
+        }
+
+        public async Task ResetPasswordAsync(int id, string newPassword)
+        {
+            var hashed = HashPassword(newPassword);
+            await _employeeRepository.ResetPasswordAsync(id, hashed);
         }
 
         private string HashPassword(string password)

@@ -17,9 +17,9 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ShiftChangeDetail>>> GetAllShiftChangeDeatils()
+        public async Task<ActionResult<IEnumerable<ShiftChangeDetail>>> GetAllShiftChangeDeatils([FromQuery] int? companyId = null)
         {
-            var ShiftChangeMasters = await _ShiftChangeMasterService.GetAllShiftChangeDetailsAsync();
+            var ShiftChangeMasters = await _ShiftChangeMasterService.GetAllShiftChangeDetailsAsync(companyId);
             return Ok(ShiftChangeMasters);
         }
 

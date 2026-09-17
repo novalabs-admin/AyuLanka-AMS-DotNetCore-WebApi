@@ -14,12 +14,17 @@ namespace AyuLanka.AMS.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync()
+        public async Task<IEnumerable<Employee>> GetAllEmployeesAsync(int? companyId = null)
         {
-            return await _context.Employees
-                            .Include(e => e.Designation)
-                            .Include(e => e.EmploymentType)
-                            .OrderBy(e => e.EmployeeNumber).ToListAsync();
+            var query = _context.Employees
+                .Include(e => e.Designation)
+                .Include(e => e.EmploymentType)
+                .AsQueryable();
+
+            if (companyId.HasValue)
+                query = query.Where(e => e.CompanyId == companyId.Value);
+
+            return await query.OrderBy(e => e.EmployeeNumber).ToListAsync();
         }
 
         public async Task<Employee> GetEmployeeByIdAsync(int id)
@@ -55,7 +60,17 @@ namespace AyuLanka.AMS.Repositories
         {
             return await _context.Employees
                                  .Include(e => e.Designation)
+                                 .Include(e => e.Company)
                                  .FirstOrDefaultAsync(e => e.Username == username);
+        }
+
+        public async Task ResetPasswordAsync(int id, string newHashedPassword)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
+                throw new KeyNotFoundException($"Employee {id} not found.");
+            employee.Password = newHashedPassword;
+            await _context.SaveChangesAsync();
         }
     }
 }

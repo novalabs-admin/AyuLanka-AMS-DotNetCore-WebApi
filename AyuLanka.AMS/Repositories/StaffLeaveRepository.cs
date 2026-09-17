@@ -26,13 +26,15 @@ namespace AyuLanka.AMS.Repositories
                                  .ToListAsync();
         }
 
-        public async Task<IEnumerable<StaffLeave>> GetAllStaffLeavesAsync()
+        public async Task<IEnumerable<StaffLeave>> GetAllStaffLeavesAsync(int? companyId = null)
         {
-            return await _context.StaffLeaves
+            var query = _context.StaffLeaves
                                 .Include(l => l.Employee)
                                 .Include(l => l.LeaveType)
-                                .OrderBy(l => l.Employee.EmployeeNumber)
-                                .ToListAsync();
+                                .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(l => l.Employee.CompanyId == companyId.Value);
+            return await query.OrderBy(l => l.Employee.EmployeeNumber).ToListAsync();
         }
 
         public async Task<StaffLeave> GetStaffLeaveByIdAsync(int id)
@@ -85,11 +87,15 @@ namespace AyuLanka.AMS.Repositories
             }
         }
 
-        public async Task<IEnumerable<StaffLeave>> GetStaffLeavesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<StaffLeave>> GetStaffLeavesByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _context.StaffLeaves
-            .Where(leave => leave.FromDate >= startDate && leave.ToDate <= endDate)
-            .ToListAsync();
+            var query = _context.StaffLeaves
+                .Include(l => l.Employee)
+                .Where(leave => leave.FromDate >= startDate && leave.ToDate <= endDate)
+                .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(l => l.Employee.CompanyId == companyId.Value);
+            return await query.ToListAsync();
         }
     }
 }

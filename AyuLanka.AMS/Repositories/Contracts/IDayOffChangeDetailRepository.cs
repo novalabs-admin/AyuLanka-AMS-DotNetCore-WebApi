@@ -4,7 +4,7 @@ namespace AyuLanka.AMS.Repositories.Contracts
 {
     public interface IDayOffChangeDetailRepository
     {
-        Task<IEnumerable<DayOffChangeDetail>> GetAllDayOffChangeDetailsAsync();
+        Task<IEnumerable<DayOffChangeDetail>> GetAllDayOffChangeDetailsAsync(int? companyId = null);
         Task<DayOffChangeDetail> GetDayOffChangeDetailByDatePreAndRosterAsync(DateTime dayOffPre, int staffRosterId);
         Task<DayOffChangeDetail> GetDayOffChangeDetailByIdAsync(int Id);
         Task<DayOffChangeDetail> CreateDayOffChangeDetailAsync(DayOffChangeDetail dayOffChangeDetail);

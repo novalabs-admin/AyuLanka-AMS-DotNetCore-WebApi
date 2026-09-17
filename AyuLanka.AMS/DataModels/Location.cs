@@ -17,7 +17,13 @@ namespace AyuLanka.AMS.DataModels
 
         public bool? IsTreatmentLocation { get; set; }
 
+        [Required]
+        public int CompanyId { get; set; }
+
         [ForeignKey("LocationTypeId")]
         public LocationType? LocationType { get; set; }
+
+        [ForeignKey(nameof(CompanyId))]
+        public Company? Company { get; set; }
     }
 }
