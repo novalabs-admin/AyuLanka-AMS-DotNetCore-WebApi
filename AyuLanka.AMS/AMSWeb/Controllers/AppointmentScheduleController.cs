@@ -281,5 +281,12 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
             await _appointmentScheduleService.DeleteAppointmentScheduleAsync(id, deletedByUserId, remark);
             return NoContent();
         }
+
+        [HttpPost("employees-by-appointment-ids")]
+        public async Task<ActionResult<IEnumerable<EmployeeForAppointmentDto>>> GetEmployeesByAppointmentIds([FromBody] List<int> appointmentIds)
+        {
+            var result = await _appointmentScheduleService.GetEmployeesByAppointmentIdsAsync(appointmentIds ?? new List<int>());
+            return Ok(result);
+        }
     }
 }

@@ -556,6 +556,20 @@ namespace AyuLanka.AMS.Repositories
                 );
         }
 
+        public async Task<List<EmployeeForAppointmentDto>> GetEmployeesByAppointmentIdsAsync(List<int> appointmentIds)
+        {
+            return await _context.AppointmentSchedules
+                .Where(a => appointmentIds.Contains(a.Id))
+                .Select(a => new EmployeeForAppointmentDto
+                {
+                    AppointmentId = a.Id,
+                    EmployeeId = a.EmployeeId,
+                    EmployeeFullName = a.Employee != null ? a.Employee.FullName : null,
+                    EmployeeCallingName = a.Employee != null ? a.Employee.CallingName : null,
+                    EmployeeNumber = a.Employee != null ? a.Employee.EmployeeNumber : null,
+                })
+                .ToListAsync();
+                
         public async Task<IEnumerable<AppointmentSchedule>> GetByDoctorSessionIdAsync(int sessionId, int? companyId = null)
         {
             var query = _context.AppointmentSchedules
