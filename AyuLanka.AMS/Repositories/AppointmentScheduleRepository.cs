@@ -569,6 +569,7 @@ namespace AyuLanka.AMS.Repositories
                     EmployeeNumber = a.Employee != null ? a.Employee.EmployeeNumber : null,
                 })
                 .ToListAsync();
+        }
                 
         public async Task<IEnumerable<AppointmentSchedule>> GetByDoctorSessionIdAsync(int sessionId, int? companyId = null)
         {
