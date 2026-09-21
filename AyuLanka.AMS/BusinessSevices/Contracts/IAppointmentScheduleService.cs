@@ -27,5 +27,6 @@ namespace AyuLanka.AMS.BusinessSevices.Contracts
         Task<IEnumerable<object>> SearchPatientsAsync(string keyword);
         Task<IEnumerable<AppointmentSchedule?>> GetCustomerDetailsByIdAsync(int customerId);
         Task<object> CreateCustomerAsync(CreateCustomerRequest request);
+        Task<List<EmployeeForAppointmentDto>> GetEmployeesByAppointmentIdsAsync(List<int> appointmentIds);
     }
 }

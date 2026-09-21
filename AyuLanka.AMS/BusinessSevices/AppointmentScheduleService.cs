@@ -488,5 +488,9 @@ namespace AyuLanka.AMS.BusinessSevices
             }
         }
 
+        public async Task<List<EmployeeForAppointmentDto>> GetEmployeesByAppointmentIdsAsync(List<int> appointmentIds)
+        {
+            return await _appointmentScheduleRepository.GetEmployeesByAppointmentIdsAsync(appointmentIds);
+        }
     }
 }

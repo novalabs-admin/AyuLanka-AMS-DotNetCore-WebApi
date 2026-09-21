@@ -26,5 +26,6 @@ namespace AyuLanka.AMS.Repositories.Contracts
         Task<int> GetMaxChitNoAsync(DateTime scheduleDate);
         Task<IEnumerable<AppointmentSchedule>> GetCustomerDetailsByIdAsync(int customerId);
         Task<bool> IsTokenExistsAsync(int tokenNo, DateTime scheduleDate, int? excludeAppointmentId = null);
+        Task<List<EmployeeForAppointmentDto>> GetEmployeesByAppointmentIdsAsync(List<int> appointmentIds);
     }
 }
