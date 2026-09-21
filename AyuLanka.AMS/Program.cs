@@ -25,6 +25,7 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.WriteIndented = true;
+        options.JsonSerializerOptions.Converters.Add(new AyuLanka.AMS.AMSWeb.Converters.TimeSpanJsonConverter());
     });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -62,6 +63,10 @@ builder.Services.AddScoped<IShiftChangeMasterRepository, ShiftChangeMasterReposi
 builder.Services.AddScoped<IShiftChangeDetailRepository, ShiftChangeDetailRepository>();
 builder.Services.AddScoped<IAppoinmentTreatmentService, AppoinmentTreatmentService>();
 builder.Services.AddScoped<IAppoinmentTreatmentRepository, AppoinmentTreatmentRepository>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IDoctorSessionRepository, DoctorSessionRepository>();
+builder.Services.AddScoped<IDoctorSessionService, DoctorSessionService>();
 
 builder.Services.AddHttpClient("CustomerApi", client =>
 {
@@ -74,7 +79,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowReactApp",
         policyBuilder =>
         {
-            policyBuilder.WithOrigins("http://localhost:3000", "http://173.212.241.66:8025", "http://oms.ayulankamedical.com", "http://oms-uat.ayulankamedical.com") // React app's URL
+            policyBuilder.WithOrigins("http://localhost:3000", "http://173.212.241.66:8025", "http://oms.ayulankamedical.com"
+                , "http://oms-uat.ayulankamedical.com", "http://oms-sigiriya.ayulankamedical.com") // React app's URL
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });

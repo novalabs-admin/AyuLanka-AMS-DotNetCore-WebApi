@@ -48,13 +48,19 @@ namespace AyuLanka.AMS.DataModels
         [MaxLength(100)]
         public string Password { get; set; }
 
+        [Required]
+        public int CompanyId { get; set; }
+
         [ForeignKey(nameof(DesignationId))]
-        public Designation Designation { get; set; }
+        public Designation? Designation { get; set; }
 
         [ForeignKey(nameof(EmploymentTypeId))]
-        public EmploymentType EmploymentType { get; set; }
+        public EmploymentType? EmploymentType { get; set; }
 
         [ForeignKey(nameof(ShiftMasterId))]
-        public ShiftMaster ShiftMaster { get; set; }
+        public ShiftMaster? ShiftMaster { get; set; }
+
+        [ForeignKey(nameof(CompanyId))]
+        public Company? Company { get; set; }
     }
 }

@@ -60,6 +60,12 @@ namespace AyuLanka.AMS.DataModels
         public bool? IsNeededToFollowUp { get; set; }
         public bool? IsPatientContacted { get; set; }
 
+        [Required]
+        public int CompanyId { get; set; }
+
+        // Link to channeling session (Kottawa only; null for regular appointments)
+        public int? DoctorSessionId { get; set; }
+
         // Self-referencing foreign key
         public int? ParentAppointmentScheduleId { get; set; }
 
@@ -69,25 +75,32 @@ namespace AyuLanka.AMS.DataModels
         public ICollection<AppointmentSchedule>? ChildAppointments { get; set; }
 
         [ForeignKey(nameof(EmployeeId))]
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
 
-        [ForeignKey(nameof(SecondaryEmployeeId))] 
-        public Employee SecondaryEmployee { get; set; }
+        [ForeignKey(nameof(SecondaryEmployeeId))]
+        public Employee? SecondaryEmployee { get; set; }
+
         [ForeignKey(nameof(DoctorEmployeeId))]
-        public Employee DoctorEmployee { get; set; }
+        public Employee? DoctorEmployee { get; set; }
 
         [ForeignKey(nameof(EnteredBy))]
-        public Employee EnteredByEmployee { get; set; }
+        public Employee? EnteredByEmployee { get; set; }
 
         [ForeignKey(nameof(UpdatedBy))]
-        public Employee UpdatedByEmployee { get; set; }
+        public Employee? UpdatedByEmployee { get; set; }
 
         [ForeignKey(nameof(DeletedBy))]
-        public Employee DeletedByEmployee { get; set; }
+        public Employee? DeletedByEmployee { get; set; }
 
         [ForeignKey(nameof(LocationId))]
         public Location? Location { get; set; }
 
-        public ICollection<AppoinmentTreatment> AppointmentTreatments { get; set; }
+        [ForeignKey(nameof(CompanyId))]
+        public Company? Company { get; set; }
+
+        [ForeignKey(nameof(DoctorSessionId))]
+        public DoctorSession? DoctorSession { get; set; }
+
+        public ICollection<AppoinmentTreatment>? AppointmentTreatments { get; set; }
     }
 }

@@ -24,9 +24,9 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<StaffLeave>>> GetAllStaffLeaves()
+        public async Task<ActionResult<IEnumerable<StaffLeave>>> GetAllStaffLeaves([FromQuery] int? companyId = null)
         {
-            var StaffLeaves = await _staffLeaveService.GetAllStaffLeavesAsync();
+            var StaffLeaves = await _staffLeaveService.GetAllStaffLeavesAsync(companyId);
             return Ok(StaffLeaves);
         }
 
@@ -68,14 +68,14 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("bydaterange")]
-        public async Task<ActionResult<IEnumerable<StaffLeave>>> GetStaffLeavesByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<IEnumerable<StaffLeave>>> GetStaffLeavesByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
             if (startDate > endDate)
             {
                 return BadRequest("Start date must be before end date.");
             }
 
-            var staffLeaves = await _staffLeaveService.GetStaffLeavesByDateRangeAsync(startDate, endDate);
+            var staffLeaves = await _staffLeaveService.GetStaffLeavesByDateRangeAsync(startDate, endDate, companyId);
             return Ok(staffLeaves);
         }
 

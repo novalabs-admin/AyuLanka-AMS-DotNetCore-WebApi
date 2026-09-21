@@ -21,15 +21,18 @@ namespace AyuLanka.AMS.Repositories
             return ShiftChangeDetail;
         }
 
-        public async Task<IEnumerable<ShiftChangeDetail>> GetAllShiftChangeDetailsAsync()
+        public async Task<IEnumerable<ShiftChangeDetail>> GetAllShiftChangeDetailsAsync(int? companyId = null)
         {
-            return await _context.ShiftChangeDetails
+            var query = _context.ShiftChangeDetails
                 .Include(c => c.ShiftChangeMaster.Employee)
                 .Include(c => c.StaffRoster)
                 .Include(c => c.ShiftMasterPre)
                 .Include(c => c.ShiftMasterPost)
-                .OrderBy(c => c.ShiftChangeMaster.Employee.EmployeeNumber)
-                .Where(c => c.IsApproved == false).ToListAsync();
+                .Where(c => c.IsApproved == false)
+                .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(c => c.ShiftChangeMaster.Employee.CompanyId == companyId.Value);
+            return await query.OrderBy(c => c.ShiftChangeMaster.Employee.EmployeeNumber).ToListAsync();
         }
 
         public async Task<ShiftChangeDetail> GetShiftChangeDetailByDatePreAndRosterAsync(int ShiftPre, int staffRosterId)

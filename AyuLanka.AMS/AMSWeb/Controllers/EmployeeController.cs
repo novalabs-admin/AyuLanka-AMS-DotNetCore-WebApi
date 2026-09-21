@@ -23,9 +23,9 @@ namespace AyuLanka.AMS.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetAllEmployees()
+        public async Task<ActionResult<IEnumerable<Employee>>> GetAllEmployees([FromQuery] int? companyId = null)
         {
-            var employees = await _employeeService.GetAllEmployeesAsync();
+            var employees = await _employeeService.GetAllEmployeesAsync(companyId);
             return Ok(employees);
         }
 
@@ -72,6 +72,22 @@ namespace AyuLanka.AMS.Controllers
             return NoContent();
         }
 
+        [HttpPatch("{id}/reset-password")]
+        public async Task<ActionResult> ResetPassword(int id, [FromBody] ResetPasswordRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.NewPassword))
+                return BadRequest("New password is required.");
+            try
+            {
+                await _employeeService.ResetPasswordAsync(id, request.NewPassword);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
         [HttpPost("login")]
         public async Task<ActionResult> Login(LoginRequestModel loginRequest)
         {
@@ -101,10 +117,12 @@ namespace AyuLanka.AMS.Controllers
             var claims = new List<Claim>
             {
                 new Claim("userId", user.Id.ToString()),
-                new Claim("fullName", user.FullName), 
-                new Claim("callingName", user.CallingName), 
-                new Claim("employeeNumber", user.EmployeeNumber), 
-                new Claim("designationCode", user.Designation.DesignationCode.ToString()) 
+                new Claim("fullName", user.FullName),
+                new Claim("callingName", user.CallingName),
+                new Claim("employeeNumber", user.EmployeeNumber),
+                new Claim("designationCode", user.Designation.DesignationCode.ToString()),
+                new Claim("companyId", user.CompanyId.ToString()),
+                new Claim("companyCode", user.Company?.CompanyCode ?? "")
             };
 
             // Create the JWT token descriptor

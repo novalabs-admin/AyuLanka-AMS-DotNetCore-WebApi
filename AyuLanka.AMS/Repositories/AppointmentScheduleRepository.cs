@@ -17,16 +17,18 @@ namespace AyuLanka.AMS.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<AppointmentSchedule>> GetAllAppointmentSchedulesAsync()
+        public async Task<IEnumerable<AppointmentSchedule>> GetAllAppointmentSchedulesAsync(int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee)       // Include Employee in the query
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
                         .Where(a => a.IsDeleted != true)
-                        .OrderBy(a => a.Employee.EmployeeNumber)
-                        .ToListAsync();
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.Employee.EmployeeNumber).ToListAsync();
         }
 
         public async Task<AppointmentSchedule?> GetAppointmentScheduleByIdAsync(int id)
@@ -42,111 +44,144 @@ namespace AyuLanka.AMS.Repositories
                         .FirstOrDefaultAsync();
         }
         
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateAsync(DateTime date)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateAsync(DateTime date, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-                        .OrderBy(a => a.TokenNo)
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
                         .Where(a => a.ScheduleDate >= date.Date && a.ScheduleDate < date.Date.AddDays(1))
                         .Where(a => a.IsDeleted != true)
                         .Where(a => a.Location != null && a.Location.LocationTypeId == 2)
-                        .ToListAsync();
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateAsync(DateTime date)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateAsync(DateTime date, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-                        .OrderBy(a => a.TokenNo)
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
                         .Where(a => a.ScheduleDate >= date.Date && a.ScheduleDate < date.Date.AddDays(1))
                         .Where(a => a.IsDeleted != true)
                         .Where(a => a.Location != null && a.Location.LocationTypeId == 1)
-                        .ToListAsync();
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetTokensByDateAsync(DateTime date)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetTokensByDateAsync(DateTime date, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
                         .Include(a => a.ChildAppointments)
-                        .OrderBy(a => a.TokenNo)
                         .Where(a => a.ScheduleDate >= date.Date && a.ScheduleDate < date.Date.AddDays(1))
                         .Where(a => a.TokenNo != null)
                         .Where(a => a.IsDeleted != true)
-                        .ToListAsync();
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetIssuedTokensByDateAsync()
+        public async Task<IEnumerable<AppointmentSchedule?>> GetTokensByDateAndCompanyCodeAsync(DateTime date, string? companyCode = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-                        .OrderBy(a => a.TokenNo)
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
+                        .Include(a => a.ChildAppointments)
+                        .Include(a => a.Company)
+                        .Where(a => a.ScheduleDate >= date.Date && a.ScheduleDate < date.Date.AddDays(1))
+                        .Where(a => a.TokenNo != null)
+                        .Where(a => a.IsDeleted != true)
+                        .AsQueryable();
+            if (!string.IsNullOrWhiteSpace(companyCode))
+                query = query.Where(a => a.Company != null && a.Company.CompanyCode == companyCode);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
+        }
+
+        public async Task<IEnumerable<AppointmentSchedule?>> GetIssuedTokensByDateAsync(int? companyId = null)
+        {
+            var query = _context.AppointmentSchedules
+                        .Include(a => a.Location)
+                        .Include(a => a.EnteredByEmployee)
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
                         .Where(a => a.ScheduleDate >= DateTime.Now.Date && a.ScheduleDate < DateTime.Now.Date.AddDays(1))
                         .Where(a => a.TokenNo != null)
                         .Where(a => a.ChitNo != null)
                         .Where(a => a.IsDeleted != true)
-                        .ToListAsync();
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetDeletedAppoitmentByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetDeletedAppoitmentByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.DeletedByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-                        .OrderBy(a => a.TokenNo)
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
                         .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
                         .Where(a => a.IsDeleted == true)
-                        .ToListAsync();
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-            .OrderBy(a => a.TokenNo)
-            .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
-            .Where(a => a.IsDeleted != true)
-            .Where(a => a.Location != null && a.Location.LocationTypeId == 2)
-                        .ToListAsync();
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
+                        .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
+                        .Where(a => a.IsDeleted != true)
+                        .Where(a => a.Location != null && a.Location.LocationTypeId == 2)
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAllAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAllAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
                         .Include(a => a.ChildAppointments)
                         .Include(a => a.AppointmentTreatments)
                             .ThenInclude(at => at.TreatmentType)
                         .Include(a => a.Employee)
-            .OrderBy(a => a.TokenNo)
-            .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
-            .Where(a => a.IsDeleted != true)
-            .Where(a => a.Location != null)
-                        .ToListAsync();
+                        .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
+                        .Where(a => a.IsDeleted != true)
+                        .Where(a => a.Location != null)
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
         public async Task<IEnumerable<DashboardDateChartDto>>GetAllDashboardChartsDatabyDateRangeAsync(DateTime startDate, DateTime endDate)
@@ -420,51 +455,57 @@ namespace AyuLanka.AMS.Repositories
         }
 
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetPrimeCareAppointmentScheduleByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-            .OrderBy(a => a.TokenNo)
-            .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
-            .Where(a => a.ChitNo != null)
-            .Where(a => a.IsDeleted != true)
-            .Where(a => a.Location != null && a.Location.LocationTypeId == 1)
-                        .ToListAsync();
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
+                        .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
+                        .Where(a => a.ChitNo != null)
+                        .Where(a => a.IsDeleted != true)
+                        .Where(a => a.Location != null && a.Location.LocationTypeId == 1)
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetCompletedPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetCompletedPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-            .OrderBy(a => a.TokenNo)
-            .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
-            .Where(a => a.ActualFromTime != null && a.ActualToTime != null)
-            .Where(a => a.EnteredDate < a.ScheduleDate)
-            .Where(a => a.IsDeleted != true)
-                        .ToListAsync();
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
+                        .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
+                        .Where(a => a.ActualFromTime != null && a.ActualToTime != null)
+                        .Where(a => a.EnteredDate < a.ScheduleDate)
+                        .Where(a => a.IsDeleted != true)
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<AppointmentSchedule?>> GetAllPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate)
+        public async Task<IEnumerable<AppointmentSchedule?>> GetAllPreScheduledAppointmentAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
-            return await _context.AppointmentSchedules
+            var query = _context.AppointmentSchedules
                         .Include(a => a.Location)
                         .Include(a => a.EnteredByEmployee)
-                        .Include(a => a.AppointmentTreatments) // Include related AppointmentTreatments
-                            .ThenInclude(at => at.TreatmentType) // Include TreatmentLocation within AppointmentTreatments
-                        .Include(a => a.Employee) // Include Employee
-            .OrderBy(a => a.TokenNo)
-            .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
-            .Where(a => a.EnteredDate < a.ScheduleDate)
-            .Where(a => a.IsDeleted != true)
-                        .ToListAsync();
+                        .Include(a => a.AppointmentTreatments)
+                            .ThenInclude(at => at.TreatmentType)
+                        .Include(a => a.Employee)
+                        .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
+                        .Where(a => a.EnteredDate < a.ScheduleDate)
+                        .Where(a => a.IsDeleted != true)
+                        .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
         public async Task<AppointmentSchedule> AddAppointmentScheduleAsync(AppointmentSchedule appointmentSchedule)
@@ -496,12 +537,13 @@ namespace AyuLanka.AMS.Repositories
             }
         }
 
-        public async Task<int> GetMaxChitNoAsync(DateTime scheduleDate)
+        public async Task<int> GetMaxChitNoAsync(DateTime scheduleDate, int? companyId = null)
         {
-            var maxChitNo = await _context.AppointmentSchedules
-                .Where(a => a.ScheduleDate.Date == scheduleDate.Date)
-                .MaxAsync(a => (int?)a.ChitNo) ?? 0;
-            return maxChitNo;
+            var query = _context.AppointmentSchedules
+                .Where(a => a.ScheduleDate.Date == scheduleDate.Date);
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.MaxAsync(a => (int?)a.ChitNo) ?? 0;
         }
 
         public async Task<bool> IsTokenExistsAsync(int tokenNo, DateTime scheduleDate, int? excludeAppointmentId = null)
@@ -527,6 +569,36 @@ namespace AyuLanka.AMS.Repositories
                     EmployeeNumber = a.Employee != null ? a.Employee.EmployeeNumber : null,
                 })
                 .ToListAsync();
+                
+        public async Task<IEnumerable<AppointmentSchedule>> GetByDoctorSessionIdAsync(int sessionId, int? companyId = null)
+        {
+            var query = _context.AppointmentSchedules
+                .Include(a => a.AppointmentTreatments)
+                    .ThenInclude(at => at.TreatmentType)
+                .Include(a => a.Employee)
+                .Include(a => a.ChildAppointments)
+                .Where(a => a.DoctorSessionId == sessionId)
+                .Where(a => a.IsDeleted != true)
+                .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
+        }
+
+        public async Task<IEnumerable<AppointmentSchedule>> GetDoctorChannelingAppointmentsByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        {
+            var query = _context.AppointmentSchedules
+                .Include(a => a.Location)
+                .Include(a => a.Employee)
+                .Include(a => a.AppointmentTreatments)
+                    .ThenInclude(at => at.TreatmentType)
+                .Where(a => a.DoctorSessionId != null)
+                .Where(a => a.IsDeleted != true)
+                .Where(a => a.ScheduleDate >= startDate.Date && a.ScheduleDate < endDate.Date.AddDays(1))
+                .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+            return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
     }
 }

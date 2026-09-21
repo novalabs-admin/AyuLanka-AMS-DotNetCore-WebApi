@@ -26,6 +26,8 @@ namespace AyuLanka.AMS.Data
         public DbSet<ShiftChangeDetail> ShiftChangeDetails { get; set; }
         public DbSet<AppoinmentTreatment> AppoinmentTreatments { get; set; }
         public DbSet<LocationType> LocationTypes { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<DoctorSession> DoctorSessions { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -70,6 +72,56 @@ namespace AyuLanka.AMS.Data
                 .HasOne(l => l.LocationType)
                 .WithMany(lt => lt.Locations)
                 .HasForeignKey(l => l.LocationTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Company FK relationships
+            modelBuilder.Entity<Employee>()
+                .HasOne(e => e.Company)
+                .WithMany()
+                .HasForeignKey(e => e.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Location>()
+                .HasOne(l => l.Company)
+                .WithMany()
+                .HasForeignKey(l => l.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<StaffRosterMaster>()
+                .HasOne(srm => srm.Company)
+                .WithMany()
+                .HasForeignKey(srm => srm.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AppointmentSchedule>()
+                .HasOne(a => a.Company)
+                .WithMany()
+                .HasForeignKey(a => a.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<AppointmentSchedule>()
+                .HasOne(a => a.DoctorSession)
+                .WithMany()
+                .HasForeignKey(a => a.DoctorSessionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // DoctorSession FK relationships
+            modelBuilder.Entity<DoctorSession>()
+                .HasOne(ds => ds.Company)
+                .WithMany()
+                .HasForeignKey(ds => ds.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DoctorSession>()
+                .HasOne(ds => ds.Doctor)
+                .WithMany()
+                .HasForeignKey(ds => ds.DoctorId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<DoctorSession>()
+                .HasOne(ds => ds.CreatedByEmployee)
+                .WithMany()
+                .HasForeignKey(ds => ds.CreatedBy)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

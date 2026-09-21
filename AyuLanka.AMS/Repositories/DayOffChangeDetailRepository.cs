@@ -21,12 +21,15 @@ namespace AyuLanka.AMS.Repositories
             return dayOffChangeDetail;
         }
 
-        public async Task<IEnumerable<DayOffChangeDetail>> GetAllDayOffChangeDetailsAsync()
+        public async Task<IEnumerable<DayOffChangeDetail>> GetAllDayOffChangeDetailsAsync(int? companyId = null)
         {
-            return await _context.DayOffChangeDetails
+            var query = _context.DayOffChangeDetails
                 .Include(c => c.DayOffChangeMaster.Employee)
-                .OrderBy(c => c.DayOffChangeMaster.Employee.EmployeeNumber)
-                .Where(c => c.IsApproved == false).ToListAsync();
+                .Where(c => c.IsApproved == false)
+                .AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(c => c.DayOffChangeMaster.Employee.CompanyId == companyId.Value);
+            return await query.OrderBy(c => c.DayOffChangeMaster.Employee.EmployeeNumber).ToListAsync();
         }
 
         public async Task<DayOffChangeDetail> GetDayOffChangeDetailByDatePreAndRosterAsync(DateTime dayOffPre, int staffRosterId)

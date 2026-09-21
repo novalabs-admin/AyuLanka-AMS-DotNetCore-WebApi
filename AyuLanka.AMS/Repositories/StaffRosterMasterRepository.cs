@@ -31,9 +31,12 @@ namespace AyuLanka.AMS.Repositories
             return rosterMaster;
         }
 
-        public async Task<List<StaffRosterMaster>> GetRosterDateRangesAsync()
+        public async Task<List<StaffRosterMaster>> GetRosterDateRangesAsync(int? companyId = null)
         {
-            return await _context.StaffRosterMasters.ToListAsync();
+            var query = _context.StaffRosterMasters.AsQueryable();
+            if (companyId.HasValue)
+                query = query.Where(r => r.CompanyId == companyId.Value);
+            return await query.ToListAsync();
         }
 
         public async Task<StaffRosterMaster> GetRosterMasterByIdAsync(int rosterMasterId)

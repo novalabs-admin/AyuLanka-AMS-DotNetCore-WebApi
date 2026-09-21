@@ -89,9 +89,9 @@ namespace AyuLanka.AMS.BusinessSevices
             return rosterMaster;
         }
 
-        public async Task<List<StaffRosterMaster>> GetRosterDateRangesAsync()
+        public async Task<List<StaffRosterMaster>> GetRosterDateRangesAsync(int? companyId = null)
         {
-            return await _staffRosterMasterRepository.GetRosterDateRangesAsync();
+            return await _staffRosterMasterRepository.GetRosterDateRangesAsync(companyId);
         }
 
         public async Task<IEnumerable<StaffRoster>> GetRosterByRosterMasterIdAsync(int rosterMasterId)

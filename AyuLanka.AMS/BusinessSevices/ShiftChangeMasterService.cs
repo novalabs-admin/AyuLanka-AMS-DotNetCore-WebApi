@@ -19,9 +19,9 @@ namespace AyuLanka.AMS.BusinessSevices
             _staffRosterRepository = staffRosterRepository;
         }
 
-        public async Task<IEnumerable<ShiftChangeDetail>> GetAllShiftChangeDetailsAsync()
+        public async Task<IEnumerable<ShiftChangeDetail>> GetAllShiftChangeDetailsAsync(int? companyId = null)
         {
-            return await _ShiftChangeDetailRepository.GetAllShiftChangeDetailsAsync();
+            return await _ShiftChangeDetailRepository.GetAllShiftChangeDetailsAsync(companyId);
         }
 
         public async Task<ShiftChangeMaster> GetShiftChangeMasterByIdAsync(int id)

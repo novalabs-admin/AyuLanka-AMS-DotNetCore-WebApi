@@ -21,16 +21,16 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAllAppointmentSchedules()
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAllAppointmentSchedules([FromQuery] int? companyId = null)
         {
-            var AppointmentSchedules = await _appointmentScheduleService.GetAllAppointmentSchedulesAsync();
+            var AppointmentSchedules = await _appointmentScheduleService.GetAllAppointmentSchedulesAsync(companyId);
             return Ok(AppointmentSchedules);
         }
 
         [HttpGet("DeletedAppointmentsByDateRange")]
-        public async Task<ActionResult<AppointmentSchedule>> GetDeletedAppoitmentByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<AppointmentSchedule>> GetDeletedAppoitmentByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
-            var AppointmentSchedule = await _appointmentScheduleService.GetDeletedAppoitmentByDateRangeAsync(startDate, endDate);
+            var AppointmentSchedule = await _appointmentScheduleService.GetDeletedAppoitmentByDateRangeAsync(startDate, endDate, companyId);
             if (AppointmentSchedule == null)
             {
                 return NotFound();
@@ -39,9 +39,9 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("ByDate/{date}")]
-        public async Task<ActionResult<AppointmentSchedule>> GetAppointmentScheduleByDate(DateTime date)
+        public async Task<ActionResult<AppointmentSchedule>> GetAppointmentScheduleByDate(DateTime date, [FromQuery] int? companyId = null)
         {
-            var AppointmentSchedule = await _appointmentScheduleService.GetAppointmentScheduleByDateAsync(date);
+            var AppointmentSchedule = await _appointmentScheduleService.GetAppointmentScheduleByDateAsync(date, companyId);
             if (AppointmentSchedule == null)
             {
                 return NotFound();
@@ -50,9 +50,9 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("PrimeCareByDate/{date}")]
-        public async Task<ActionResult<AppointmentSchedule>> GetPrimeCareAppointmentScheduleByDate(DateTime date)
+        public async Task<ActionResult<AppointmentSchedule>> GetPrimeCareAppointmentScheduleByDate(DateTime date, [FromQuery] int? companyId = null)
         {
-            var AppointmentSchedule = await _appointmentScheduleService.GetPrimeCareAppointmentScheduleByDateAsync(date);
+            var AppointmentSchedule = await _appointmentScheduleService.GetPrimeCareAppointmentScheduleByDateAsync(date, companyId);
             if (AppointmentSchedule == null)
             {
                 return NotFound();
@@ -61,9 +61,20 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("tokensbydate")]
-        public async Task<ActionResult<AppointmentSchedule>> GetTokensByDate([FromQuery] DateTime date)
+        public async Task<ActionResult<AppointmentSchedule>> GetTokensByDate([FromQuery] DateTime date, [FromQuery] int? companyId = null)
         {
-            var AppointmentSchedule = await _appointmentScheduleService.GetTokensByDateAsync(date);
+            var AppointmentSchedule = await _appointmentScheduleService.GetTokensByDateAsync(date, companyId);
+            if (AppointmentSchedule == null)
+            {
+                return NotFound();
+            }
+            return Ok(AppointmentSchedule);
+        }
+
+        [HttpGet("tokensbydateandcompanycode")]
+        public async Task<ActionResult<AppointmentSchedule>> GetTokensByDateAndCompanyCode([FromQuery] DateTime date, [FromQuery] string? companyCode = null)
+        {
+            var AppointmentSchedule = await _appointmentScheduleService.GetTokensByDateAndCompanyCodeAsync(date, companyCode);
             if (AppointmentSchedule == null)
             {
                 return NotFound();
@@ -72,9 +83,9 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("issuedtokens")]
-        public async Task<ActionResult<AppointmentSchedule>> GetIssuedTokensByDate()
+        public async Task<ActionResult<AppointmentSchedule>> GetIssuedTokensByDate([FromQuery] int? companyId = null)
         {
-            var AppointmentSchedule = await _appointmentScheduleService.GetIssuedTokensByDateAsync();
+            var AppointmentSchedule = await _appointmentScheduleService.GetIssuedTokensByDateAsync(companyId);
             if (AppointmentSchedule == null)
             {
                 return NotFound();
@@ -83,26 +94,26 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("bydaterange")]
-        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAppointmentScheduleByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAppointmentScheduleByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
             if (startDate > endDate)
             {
                 return BadRequest("Start date must be before end date.");
             }
 
-            var result = await _appointmentScheduleService.GetAppointmentScheduleByDateRangeAsync(startDate, endDate);
+            var result = await _appointmentScheduleService.GetAppointmentScheduleByDateRangeAsync(startDate, endDate, companyId);
             return Ok(result);
         }
 
         [HttpGet("allbydaterange")]
-        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAllAppointmentScheduleByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAllAppointmentScheduleByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
             if (startDate > endDate)
             {
                 return BadRequest("Start date must be before end date.");
             }
 
-            var result = await _appointmentScheduleService.GetAllAppointmentScheduleByDateRangeAsync(startDate, endDate);
+            var result = await _appointmentScheduleService.GetAllAppointmentScheduleByDateRangeAsync(startDate, endDate, companyId);
             return Ok(result);
         }
 
@@ -141,9 +152,10 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
 
 
         [HttpGet("patientsearch")]
-        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> SearchPatients(string keyword)
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> SearchPatients(
+            string keyword, [FromQuery] string? companyCode = null)
         {
-            var result = await _appointmentScheduleService.SearchPatientsAsync(keyword);
+            var result = await _appointmentScheduleService.SearchPatientsAsync(keyword, companyCode);
             return Ok(result);
         }
 
@@ -162,38 +174,55 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
         }
 
         [HttpGet("primecarebydaterange")]
-        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetPrimeCareAppointmentScheduleByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetPrimeCareAppointmentScheduleByDateRange([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
             if (startDate > endDate)
             {
                 return BadRequest("Start date must be before end date.");
             }
 
-            var result = await _appointmentScheduleService.GetPrimeCareAppointmentScheduleByDateRangeAsync(startDate, endDate);
+            var result = await _appointmentScheduleService.GetPrimeCareAppointmentScheduleByDateRangeAsync(startDate, endDate, companyId);
             return Ok(result);
         }
 
         [HttpGet("getAllPreScheduledScheduledAppointments")]
-        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAllPreScheduledAppointment([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetAllPreScheduledAppointment([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
             if (startDate > endDate)
             {
                 return BadRequest("Start date must be before end date.");
             }
 
-            var result = await _appointmentScheduleService.GetAllPreScheduledAppointmentAsync(startDate, endDate);
+            var result = await _appointmentScheduleService.GetAllPreScheduledAppointmentAsync(startDate, endDate, companyId);
             return Ok(result);
         }
 
         [HttpGet("getCompletedPreScheduledScheduledAppointments")]
-        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetCompletedPreScheduledAppointment([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetCompletedPreScheduledAppointment([FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
             if (startDate > endDate)
             {
                 return BadRequest("Start date must be before end date.");
             }
 
-            var result = await _appointmentScheduleService.GetCompletedPreScheduledAppointmentAsync(startDate, endDate);
+            var result = await _appointmentScheduleService.GetCompletedPreScheduledAppointmentAsync(startDate, endDate, companyId);
+            return Ok(result);
+        }
+
+        [HttpGet("doctorechannelingbydaterange")]
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetDoctorChannelingAppointmentsByDateRange(
+            [FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
+        {
+            if (startDate > endDate)
+                return BadRequest("Start date must be before end date.");
+            var result = await _appointmentScheduleService.GetDoctorChannelingAppointmentsByDateRangeAsync(startDate, endDate, companyId);
+            return Ok(result);
+        }
+
+        [HttpGet("ByDoctorSession/{sessionId}")]
+        public async Task<ActionResult<IEnumerable<AppointmentSchedule>>> GetByDoctorSession(int sessionId, [FromQuery] int? companyId = null)
+        {
+            var result = await _appointmentScheduleService.GetByDoctorSessionIdAsync(sessionId, companyId);
             return Ok(result);
         }
 

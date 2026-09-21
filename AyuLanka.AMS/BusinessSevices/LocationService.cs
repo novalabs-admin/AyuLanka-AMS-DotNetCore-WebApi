@@ -18,14 +18,19 @@ namespace AyuLanka.AMS.BusinessSevices
             return await _locationRepository.GetAllLocationAsync();
         }
 
-        public async Task<IEnumerable<Location>> GetPrimeCareLocationAsync()
+        public async Task<IEnumerable<Location>> GetPrimeCareLocationAsync(int? companyId = null)
         {
-            return await _locationRepository.GetPrimeCareLocationAsync();
+            return await _locationRepository.GetPrimeCareLocationAsync(companyId);
         }
 
-        public async Task<IEnumerable<Location>> GetEliteCareLocationAsync()
+        public async Task<IEnumerable<Location>> GetEliteCareLocationAsync(int? companyId = null)
         {
-            return await _locationRepository.GetEliteCareLocationAsync();
+            return await _locationRepository.GetEliteCareLocationAsync(companyId);
+        }
+
+        public async Task<IEnumerable<Location>> GetDoctorChannelingLocationAsync(int? companyId = null)
+        {
+            return await _locationRepository.GetDoctorChannelingLocationAsync(companyId);
         }
     }
 }
