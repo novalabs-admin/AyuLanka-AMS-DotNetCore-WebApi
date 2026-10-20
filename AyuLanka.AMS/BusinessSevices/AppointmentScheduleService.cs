@@ -122,7 +122,7 @@ namespace AyuLanka.AMS.BusinessSevices
             var client = _httpClientFactory.CreateClient("CustomerApi");
 
             var response = await client.GetAsync(
-                $"api/customer/search-customers?searchTerm={Uri.EscapeDataString(keyword)}"
+                $"api/userManagement/customer/search-customers?searchTerm={Uri.EscapeDataString(keyword)}"
             );
 
             if (!response.IsSuccessStatusCode)
@@ -167,7 +167,7 @@ namespace AyuLanka.AMS.BusinessSevices
             );
 
             var response = await client.PostAsync(
-                "api/customer",
+                "api/userManagement/customer",
                 content
             );
 
