@@ -70,7 +70,8 @@ builder.Services.AddScoped<IDoctorSessionService, DoctorSessionService>();
 
 builder.Services.AddHttpClient("CustomerApi", client =>
 {
-    client.BaseAddress = new Uri("http://api.ayulankamedical.com/");
+    client.BaseAddress = new Uri(builder.Configuration["ExternalApis:CustomerApiBaseUrl"]
+        ?? throw new InvalidOperationException("ExternalApis:CustomerApiBaseUrl is not configured."));
 });
 
 // Add CORS policy
