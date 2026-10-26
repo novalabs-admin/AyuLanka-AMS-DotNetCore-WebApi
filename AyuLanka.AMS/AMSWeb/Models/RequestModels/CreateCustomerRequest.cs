@@ -5,5 +5,7 @@
         public string CustomerName { get; set; }
         public string Phone { get; set; }
         public string? CompanyCode { get; set; }
+        public int? CityId { get; set; }
+        public string? Remark { get; set; }
     }
 }
