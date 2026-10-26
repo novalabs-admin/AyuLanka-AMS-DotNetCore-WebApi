@@ -67,6 +67,7 @@ builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDoctorSessionRepository, DoctorSessionRepository>();
 builder.Services.AddScoped<IDoctorSessionService, DoctorSessionService>();
+builder.Services.AddScoped<IGeographyService, GeographyService>();
 
 builder.Services.AddHttpClient("CustomerApi", client =>
 {
