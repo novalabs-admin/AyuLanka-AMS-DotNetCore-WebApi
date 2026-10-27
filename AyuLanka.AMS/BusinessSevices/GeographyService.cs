@@ -76,7 +76,30 @@ namespace AyuLanka.AMS.BusinessSevices
 
             return JsonSerializer.Deserialize<JsonElement>(body);
         }
+        
+        public async Task<IEnumerable<CountryDto>> SearchCountriesAsync(string keyword, int limit = 20)
+        {
+            if (string.IsNullOrWhiteSpace(keyword))
+                return Enumerable.Empty<CountryDto>();
 
+            var client = _httpClientFactory.CreateClient("CustomerApi");
+
+            var response = await client.GetAsync(
+                $"api/userManagement/country/search?name={Uri.EscapeDataString(keyword)}&limit={limit}"
+            );
+
+            if (!response.IsSuccessStatusCode)
+                return Enumerable.Empty<CountryDto>();
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var apiResponse = JsonSerializer.Deserialize<ApiResponse<CountryDto>>(json, JsonOptions);
+
+            return apiResponse?.Data?.Result ?? Enumerable.Empty<CountryDto>();
+        }
+
+
+        // Helper method to get results from the API and deserialize them into a list of type T
         private async Task<IEnumerable<T>> GetResultAsync<T>(string url)
         {
             var client = _httpClientFactory.CreateClient("CustomerApi");
@@ -91,5 +114,6 @@ namespace AyuLanka.AMS.BusinessSevices
             return JsonSerializer.Deserialize<ApiResponse<T>>(body, JsonOptions)?.Data?.Result
                 ?? Enumerable.Empty<T>();
         }
+
     }
 }

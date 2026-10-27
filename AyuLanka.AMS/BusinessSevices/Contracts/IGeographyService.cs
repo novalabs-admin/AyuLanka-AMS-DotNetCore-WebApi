@@ -12,5 +12,7 @@ namespace AyuLanka.AMS.BusinessSevices.Contracts
         Task<IEnumerable<DistrictDto>> GetDistrictsAsync(int? provinceId = null);
 
         Task<object> CreateCityAsync(CityCreateRequestModel request);
+
+        Task<IEnumerable<CountryDto>> SearchCountriesAsync(string keyword, int limit = 20);
     }
 }

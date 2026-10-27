@@ -36,6 +36,12 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
             return Ok(await _geographyService.GetDistrictsAsync(provinceId));
         }
 
+        [HttpGet("search-countries")]
+        public async Task<ActionResult<IEnumerable<CountryDto>>> SearchCountries([FromQuery] string keyword, [FromQuery] int limit = 20)
+        {
+            return Ok(await _geographyService.SearchCountriesAsync(keyword, limit));
+        }
+
         [HttpPost("cities")]
         public async Task<IActionResult> CreateCity(CityCreateRequestModel request)
         {

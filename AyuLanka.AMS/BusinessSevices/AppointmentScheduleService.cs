@@ -156,8 +156,9 @@ namespace AyuLanka.AMS.BusinessSevices
                 customerName = request.CustomerName,
                 phone = request.Phone,
                 CustomerType = "patient",
-                CityId = request.CityId ?? null,
                 Remark = request.Remark ?? null,
+                CityId = request.CityId ?? null,
+                CountryId = request.CountryId ?? null
             };
 
             var json = JsonSerializer.Serialize(payload);
