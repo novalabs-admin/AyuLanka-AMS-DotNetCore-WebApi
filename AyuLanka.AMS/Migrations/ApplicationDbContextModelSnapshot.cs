@@ -68,6 +68,9 @@ namespace AyuLanka.AMS.Migrations
                     b.Property<int?>("ChitNo")
                         .HasColumnType("int");
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ContactNo")
                         .IsRequired()
                         .HasMaxLength(15)
@@ -88,6 +91,9 @@ namespace AyuLanka.AMS.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("DoctorEmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DoctorSessionId")
                         .HasColumnType("int");
 
                     b.Property<int?>("EmployeeId")
@@ -146,9 +152,13 @@ namespace AyuLanka.AMS.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyId");
+
                     b.HasIndex("DeletedBy");
 
                     b.HasIndex("DoctorEmployeeId");
+
+                    b.HasIndex("DoctorSessionId");
 
                     b.HasIndex("EmployeeId");
 
@@ -163,6 +173,42 @@ namespace AyuLanka.AMS.Migrations
                     b.HasIndex("UpdatedBy");
 
                     b.ToTable("AppointmentSchedules");
+                });
+
+            modelBuilder.Entity("AyuLanka.AMS.DataModels.Company", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("CompanyCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNo")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Companies");
                 });
 
             modelBuilder.Entity("AyuLanka.AMS.DataModels.DayOffChangeDetail", b =>
@@ -305,6 +351,56 @@ namespace AyuLanka.AMS.Migrations
                     b.ToTable("Designations");
                 });
 
+            modelBuilder.Entity("AyuLanka.AMS.DataModels.DoctorSession", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DoctorId")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MaxPatients")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("SessionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("DoctorSessions");
+                });
+
             modelBuilder.Entity("AyuLanka.AMS.DataModels.Employee", b =>
                 {
                     b.Property<int>("Id")
@@ -322,6 +418,9 @@ namespace AyuLanka.AMS.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
 
                     b.Property<int>("DesignationId")
                         .HasColumnType("int");
@@ -361,6 +460,8 @@ namespace AyuLanka.AMS.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("DesignationId");
 
@@ -415,6 +516,9 @@ namespace AyuLanka.AMS.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<bool?>("IsTreatmentLocation")
                         .HasColumnType("bit");
 
@@ -427,6 +531,8 @@ namespace AyuLanka.AMS.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.HasIndex("LocationTypeId");
 
@@ -665,6 +771,9 @@ namespace AyuLanka.AMS.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("FromDate")
                         .HasColumnType("datetime2");
 
@@ -675,6 +784,8 @@ namespace AyuLanka.AMS.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("StaffRosterMasters");
                 });
@@ -727,6 +838,9 @@ namespace AyuLanka.AMS.Migrations
                     b.Property<string>("TreatmentShortCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("UnitPrice")
+                        .HasColumnType("decimal(9,2)");
+
                     b.HasKey("Id");
 
                     b.ToTable("TreatmentTypes");
@@ -753,6 +867,12 @@ namespace AyuLanka.AMS.Migrations
 
             modelBuilder.Entity("AyuLanka.AMS.DataModels.AppointmentSchedule", b =>
                 {
+                    b.HasOne("AyuLanka.AMS.DataModels.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("AyuLanka.AMS.DataModels.Employee", "DeletedByEmployee")
                         .WithMany()
                         .HasForeignKey("DeletedBy");
@@ -760,6 +880,11 @@ namespace AyuLanka.AMS.Migrations
                     b.HasOne("AyuLanka.AMS.DataModels.Employee", "DoctorEmployee")
                         .WithMany()
                         .HasForeignKey("DoctorEmployeeId");
+
+                    b.HasOne("AyuLanka.AMS.DataModels.DoctorSession", "DoctorSession")
+                        .WithMany()
+                        .HasForeignKey("DoctorSessionId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("AyuLanka.AMS.DataModels.Employee", "Employee")
                         .WithMany()
@@ -787,9 +912,13 @@ namespace AyuLanka.AMS.Migrations
                         .WithMany()
                         .HasForeignKey("UpdatedBy");
 
+                    b.Navigation("Company");
+
                     b.Navigation("DeletedByEmployee");
 
                     b.Navigation("DoctorEmployee");
+
+                    b.Navigation("DoctorSession");
 
                     b.Navigation("Employee");
 
@@ -861,8 +990,41 @@ namespace AyuLanka.AMS.Migrations
                     b.Navigation("StaffRosterMaster");
                 });
 
+            modelBuilder.Entity("AyuLanka.AMS.DataModels.DoctorSession", b =>
+                {
+                    b.HasOne("AyuLanka.AMS.DataModels.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AyuLanka.AMS.DataModels.Employee", "CreatedByEmployee")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AyuLanka.AMS.DataModels.Employee", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("CreatedByEmployee");
+
+                    b.Navigation("Doctor");
+                });
+
             modelBuilder.Entity("AyuLanka.AMS.DataModels.Employee", b =>
                 {
+                    b.HasOne("AyuLanka.AMS.DataModels.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("AyuLanka.AMS.DataModels.Designation", "Designation")
                         .WithMany()
                         .HasForeignKey("DesignationId")
@@ -881,6 +1043,8 @@ namespace AyuLanka.AMS.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.Navigation("Company");
+
                     b.Navigation("Designation");
 
                     b.Navigation("EmploymentType");
@@ -890,10 +1054,18 @@ namespace AyuLanka.AMS.Migrations
 
             modelBuilder.Entity("AyuLanka.AMS.DataModels.Location", b =>
                 {
+                    b.HasOne("AyuLanka.AMS.DataModels.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("AyuLanka.AMS.DataModels.LocationType", "LocationType")
                         .WithMany("Locations")
                         .HasForeignKey("LocationTypeId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Company");
 
                     b.Navigation("LocationType");
                 });
@@ -1015,6 +1187,17 @@ namespace AyuLanka.AMS.Migrations
                     b.Navigation("ShiftMaster");
 
                     b.Navigation("StaffRosterMaster");
+                });
+
+            modelBuilder.Entity("AyuLanka.AMS.DataModels.StaffRosterMaster", b =>
+                {
+                    b.HasOne("AyuLanka.AMS.DataModels.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("AyuLanka.AMS.DataModels.TreatmentLocation", b =>

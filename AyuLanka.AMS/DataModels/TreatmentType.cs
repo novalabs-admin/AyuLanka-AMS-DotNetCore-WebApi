@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AyuLanka.AMS.DataModels
 {
@@ -17,5 +18,8 @@ namespace AyuLanka.AMS.DataModels
         public int? DurationMinutes { get; set; }
         public bool IsActive { get; set; } = true;
         public string? TreatmentShortCode { get; set; }
+
+        [Column(TypeName = "decimal(9,2)")]
+        public decimal? UnitPrice { get; set; }
     }
 }
