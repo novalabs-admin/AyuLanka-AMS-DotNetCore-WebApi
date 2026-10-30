@@ -283,6 +283,14 @@ namespace AyuLanka.AMS.BusinessSevices
             {
                 AppointmentSchedule appointmentResult = null;
 
+                // Next appointments (follow-ups) must always carry a token; the UI enforces it, this is the last line of defence.
+                if (appointmentScheduleRequestModel.Id == 0 &&
+                    appointmentScheduleRequestModel.ParentAppointmentScheduleId != null &&
+                    !appointmentScheduleRequestModel.TokenNo.HasValue)
+                {
+                    throw new InvalidOperationException("A token number is required to create a next appointment.");
+                }
+
                 if (appointmentScheduleRequestModel.TokenNo.HasValue)
                 {
                     var tokenExists = await _appointmentScheduleRepository.IsTokenExistsAsync(

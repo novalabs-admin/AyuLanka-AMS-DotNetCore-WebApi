@@ -548,12 +548,14 @@ namespace AyuLanka.AMS.Repositories
 
         public async Task<bool> IsTokenExistsAsync(int tokenNo, DateTime scheduleDate, int? excludeAppointmentId = null)
         {
+            var dayStart = scheduleDate.Date;
+            var dayEnd = dayStart.AddDays(1);
+
             return await _context.AppointmentSchedules.AnyAsync(a =>
-                    a.TokenNo == tokenNo &&
-                    a.IsDeleted == false &&
-                    a.ScheduleDate.Date == scheduleDate.Date &&
-                    (excludeAppointmentId == null || a.Id != excludeAppointmentId)
-                );
+                a.TokenNo == tokenNo &&
+                a.IsDeleted != true &&                       // was == false, which ignored NULL rows
+                a.ScheduleDate >= dayStart && a.ScheduleDate < dayEnd &&
+                (excludeAppointmentId == null || a.Id != excludeAppointmentId));
         }
 
         public async Task<List<EmployeeForAppointmentDto>> GetEmployeesByAppointmentIdsAsync(List<int> appointmentIds)
