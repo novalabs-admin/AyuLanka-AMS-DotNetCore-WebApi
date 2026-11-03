@@ -546,14 +546,16 @@ namespace AyuLanka.AMS.Repositories
             return await query.MaxAsync(a => (int?)a.ChitNo) ?? 0;
         }
 
-        public async Task<bool> IsTokenExistsAsync(int tokenNo, DateTime scheduleDate, int? excludeAppointmentId = null)
+        public async Task<bool> IsTokenExistsAsync(int tokenNo, DateTime scheduleDate, int companyId, int? doctorSessionId, int? excludeAppointmentId = null)
         {
             var dayStart = scheduleDate.Date;
             var dayEnd = dayStart.AddDays(1);
 
             return await _context.AppointmentSchedules.AnyAsync(a =>
                 a.TokenNo == tokenNo &&
-                a.IsDeleted != true &&                       // was == false, which ignored NULL rows
+                a.CompanyId == companyId &&
+                a.DoctorSessionId == doctorSessionId &&   // normal appointments are null; channeling tokens are per session
+                a.IsDeleted != true &&
                 a.ScheduleDate >= dayStart && a.ScheduleDate < dayEnd &&
                 (excludeAppointmentId == null || a.Id != excludeAppointmentId));
         }
