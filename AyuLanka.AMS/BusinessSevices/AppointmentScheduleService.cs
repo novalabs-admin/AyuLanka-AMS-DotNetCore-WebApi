@@ -296,6 +296,8 @@ namespace AyuLanka.AMS.BusinessSevices
                     var tokenExists = await _appointmentScheduleRepository.IsTokenExistsAsync(
                         appointmentScheduleRequestModel.TokenNo.Value,
                         appointmentScheduleRequestModel.ScheduleDate,
+                        appointmentScheduleRequestModel.CompanyId,
+                        appointmentScheduleRequestModel.DoctorSessionId,
                         appointmentScheduleRequestModel.Id == 0 ? null : appointmentScheduleRequestModel.Id
                     );
 
@@ -511,9 +513,9 @@ namespace AyuLanka.AMS.BusinessSevices
             await _appointmentScheduleRepository.DeleteAppointmentScheduleAsync(id, deletedByUserId, remark);
         }
 
-        public async Task<bool> IsTokenExistsAsync(int tokenNo, DateTime scheduleDate, int? excludeAppointmentId = null)
+        public async Task<bool> IsTokenExistsAsync(int tokenNo, DateTime scheduleDate, int companyId, int? doctorSessionId, int? excludeAppointmentId = null)
         {
-            return await _appointmentScheduleRepository.IsTokenExistsAsync(tokenNo, scheduleDate, excludeAppointmentId);
+            return await _appointmentScheduleRepository.IsTokenExistsAsync(tokenNo, scheduleDate, companyId, doctorSessionId, excludeAppointmentId);
         }
 
 
