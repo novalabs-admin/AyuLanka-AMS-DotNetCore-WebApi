@@ -605,5 +605,68 @@ namespace AyuLanka.AMS.Repositories
                 query = query.Where(a => a.CompanyId == companyId.Value);
             return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
+
+        public async Task<IEnumerable<UnlinkedAppointmentDto>> GetUnlinkedAppointmentsAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        {
+            var start = startDate.Date;
+            var end = endDate.Date.AddDays(1);
+
+            var issued = _context.AppointmentSchedules.AsNoTracking()
+                .Where(a => a.IsDeleted != true && a.ChitNo != null);
+            if (companyId.HasValue)
+                issued = issued.Where(a => a.CompanyId == companyId.Value);
+
+            // 1) Issued visits in the range with no live linked next appointment
+            var candidates = await issued
+                .Where(a => a.ScheduleDate >= start && a.ScheduleDate < end &&
+                    !_context.AppointmentSchedules.Any(c => c.ParentAppointmentScheduleId == a.Id && c.IsDeleted != true))
+                .OrderBy(a => a.ScheduleDate).ThenBy(a => a.TokenNo)
+                .Select(a => new UnlinkedAppointmentDto
+                {
+                    Id = a.Id,
+                    TokenNo = a.TokenNo,
+                    ChitNo = a.ChitNo,
+                    CustomerId = a.CustomerId,
+                    CustomerName = a.CustomerName,
+                    ContactNo = a.ContactNo,
+                    EmployeeName = a.Employee != null ? a.Employee.CallingName : null,
+                    SecondaryEmployeeName = a.SecondaryEmployee != null ? a.SecondaryEmployee.CallingName : null,
+                    LocationName = a.Location != null ? a.Location.Name : null,
+                    TreatmentTypes = a.AppointmentTreatments.Select(t => t.TreatmentType.Name).ToList(),
+                    ScheduleDate = a.ScheduleDate,
+                    FromTime = a.FromTime,
+                    ToTime = a.ToTime,
+                    ActualFromTime = a.ActualFromTime,
+                    ActualToTime = a.ActualToTime,
+                    Remarks = a.Remarks,
+                    TokenIssueTime = a.TokenIssueTime,
+                    EnteredByName = a.EnteredByEmployee != null ? a.EnteredByEmployee.CallingName : null,
+                    EnteredDate = a.EnteredDate
+                })
+                .ToListAsync();
+
+            if (candidates.Count == 0) return candidates;
+
+            // 2) Every issued visit (any date) of those patients; keep a candidate only if it is the patient's latest
+            var customerIds = candidates.Where(c => c.CustomerId != null).Select(c => c.CustomerId!.Value).Distinct().ToList();
+            var contactNos = candidates.Where(c => c.CustomerId == null).Select(c => c.ContactNo).Distinct().ToList();
+
+            var visits = await issued
+                .Where(b => (b.CustomerId != null && customerIds.Contains(b.CustomerId.Value)) ||
+                            (b.CustomerId == null && contactNos.Contains(b.ContactNo)))
+                .Select(b => new { b.Id, b.CustomerId, b.ContactNo, b.ScheduleDate })
+                .ToListAsync();
+
+            static string PatientKey(int? customerId, string contactNo) =>
+                customerId != null ? $"c{customerId}" : $"p{contactNo}";
+
+            var latestVisitId = visits
+                .GroupBy(v => PatientKey(v.CustomerId, v.ContactNo))
+                .ToDictionary(g => g.Key, g => g.OrderByDescending(v => v.ScheduleDate).ThenByDescending(v => v.Id).First().Id);
+
+            return candidates
+                .Where(c => latestVisitId.TryGetValue(PatientKey(c.CustomerId, c.ContactNo), out var id) && id == c.Id)
+                .ToList();
+        }
     }
 }

@@ -288,5 +288,13 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
             var result = await _appointmentScheduleService.GetEmployeesByAppointmentIdsAsync(appointmentIds ?? new List<int>());
             return Ok(result);
         }
+
+        [HttpGet("unlinkedappointments")]
+        public async Task<ActionResult<IEnumerable<UnlinkedAppointmentDto>>> GetUnlinkedAppointments(
+            [FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
+        {
+            if (startDate > endDate) return BadRequest("Start date must be before end date.");
+            return Ok(await _appointmentScheduleService.GetUnlinkedAppointmentsAsync(startDate, endDate, companyId));
+        }
     }
 }
