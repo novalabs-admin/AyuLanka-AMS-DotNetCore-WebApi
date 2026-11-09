@@ -556,5 +556,10 @@ namespace AyuLanka.AMS.BusinessSevices
         {
             return await _appointmentScheduleRepository.GetEmployeesByAppointmentIdsAsync(appointmentIds);
         }
+
+        public async Task<IEnumerable<UnlinkedAppointmentDto>> GetUnlinkedAppointmentsAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        {
+            return await _appointmentScheduleRepository.GetUnlinkedAppointmentsAsync(startDate, endDate, companyId);
+        }
     }
 }

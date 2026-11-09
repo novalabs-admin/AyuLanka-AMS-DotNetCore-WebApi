@@ -31,5 +31,6 @@ namespace AyuLanka.AMS.BusinessSevices.Contracts
         Task<List<EmployeeForAppointmentDto>> GetEmployeesByAppointmentIdsAsync(List<int> appointmentIds);
         Task<IEnumerable<AppointmentSchedule>> GetByDoctorSessionIdAsync(int sessionId, int? companyId = null);
         Task<IEnumerable<AppointmentSchedule>> GetDoctorChannelingAppointmentsByDateRangeAsync(DateTime startDate, DateTime endDate, int? companyId = null);
+        Task<IEnumerable<UnlinkedAppointmentDto>> GetUnlinkedAppointmentsAsync(DateTime startDate, DateTime endDate, int? companyId = null);
     }
 }
