@@ -619,7 +619,8 @@ namespace AyuLanka.AMS.Repositories
             // 1) Issued visits in the range with no live linked next appointment
             var candidates = await issued
                 .Where(a => a.ScheduleDate >= start && a.ScheduleDate < end &&
-                    !_context.AppointmentSchedules.Any(c => c.ParentAppointmentScheduleId == a.Id && c.IsDeleted != true))
+                    //!_context.AppointmentSchedules.Any(c => c.ParentAppointmentScheduleId == a.Id && c.IsDeleted != true))
+                    !_context.AppointmentSchedules.Any(c => c.ParentAppointmentScheduleId == a.Id))
                 .OrderBy(a => a.ScheduleDate).ThenBy(a => a.TokenNo)
                 .Select(a => new UnlinkedAppointmentDto
                 {
