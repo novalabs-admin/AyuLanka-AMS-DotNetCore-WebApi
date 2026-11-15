@@ -289,8 +289,16 @@ namespace AyuLanka.AMS.AMSWeb.Controllers
             return Ok(result);
         }
 
+        [HttpGet("appointmentreport")]
+        public async Task<ActionResult<IEnumerable<AppointmentReportDto>>> GetAppointmentReport(
+            [FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
+        {
+            if (startDate > endDate) return BadRequest("Start date must be before end date.");
+            return Ok(await _appointmentScheduleService.GetAppointmentReportAsync(startDate, endDate, companyId));
+        }
+
         [HttpGet("unlinkedappointments")]
-        public async Task<ActionResult<IEnumerable<UnlinkedAppointmentDto>>> GetUnlinkedAppointments(
+        public async Task<ActionResult<IEnumerable<AppointmentReportDto>>> GetUnlinkedAppointments(
             [FromQuery] DateTime startDate, [FromQuery] DateTime endDate, [FromQuery] int? companyId = null)
         {
             if (startDate > endDate) return BadRequest("Start date must be before end date.");

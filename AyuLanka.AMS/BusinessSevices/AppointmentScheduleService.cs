@@ -6,7 +6,9 @@ using AyuLanka.AMS.Repositories.Contracts;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Transactions;
@@ -21,18 +23,21 @@ namespace AyuLanka.AMS.BusinessSevices
         private readonly IConfiguration _configuration;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ILogger<AppointmentScheduleService> _logger;
 
         public AppointmentScheduleService(IAppointmentScheduleRepository appointmentScheduleRepository, 
             ILocationRepository locationRepository,
             IEmployeeRepository employeeRepository,
             IConfiguration configuration,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            ILogger<AppointmentScheduleService> logger)
         {
             _appointmentScheduleRepository = appointmentScheduleRepository;
             _locationRepository = locationRepository;
             _employeeRepository = employeeRepository;
             _configuration = configuration;
             _httpClientFactory = httpClientFactory;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<AppointmentSchedule>> GetAllAppointmentSchedulesAsync(int? companyId = null)
@@ -557,7 +562,69 @@ namespace AyuLanka.AMS.BusinessSevices
             return await _appointmentScheduleRepository.GetEmployeesByAppointmentIdsAsync(appointmentIds);
         }
 
-        public async Task<IEnumerable<UnlinkedAppointmentDto>> GetUnlinkedAppointmentsAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        public async Task<IEnumerable<AppointmentReportDto>> GetAppointmentReportAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        {
+            var rows = (await _appointmentScheduleRepository.GetAppointmentReportAsync(startDate, endDate, companyId)).ToList();
+
+            // One lookup for every distinct item code in the report, then each appointment gets its distinct item modes
+            var codes = rows.SelectMany(r => r.TreatmentShortCodes).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+            var modesByCode = await GetItemModesByItemCodesAsync(codes);
+
+            foreach (var row in rows)
+            {
+                row.ItemModes = row.TreatmentShortCodes
+                    .Where(modesByCode.ContainsKey)
+                    .SelectMany(code => modesByCode[code])
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(name => name)
+                    .ToList();
+            }
+
+            return rows;
+        }
+
+        // Item modes per item code from the user-management API. The report is still returned (without item
+        // modes) if that API is unavailable, so a failure here is logged rather than thrown.
+        private async Task<Dictionary<string, List<string>>> GetItemModesByItemCodesAsync(List<string> itemCodes)
+        {
+            var result = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+            if (itemCodes.Count == 0) return result;
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("CustomerApi");
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                // Do not let an unreachable user-management API hold the whole report (the default wait is 100 s)
+                using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(15));
+
+                foreach (var chunk in itemCodes.Chunk(200))
+                {
+                    using var response = await client.PostAsJsonAsync(
+                        "api/userManagement/itemMode/GetItemModesByItemCodes", new { itemCodes = chunk }, cts.Token);
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogWarning("Item mode lookup failed with HTTP {Status}", (int)response.StatusCode);
+                        continue;
+                    }
+
+                    var json = await response.Content.ReadAsStringAsync(cts.Token);
+                    var items = JsonSerializer.Deserialize<ApiResponse<ItemModeLookupDto>>(json, options)?.Data?.Result;
+                    if (items == null) continue;
+
+                    foreach (var item in items)
+                        result[item.ItemCode] = item.ItemModes.Select(m => m.Name).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Item mode lookup failed; the Appointment Report is returned without item modes");
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<AppointmentReportDto>> GetUnlinkedAppointmentsAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
             return await _appointmentScheduleRepository.GetUnlinkedAppointmentsAsync(startDate, endDate, companyId);
         }
