@@ -4,6 +4,7 @@ using AyuLanka.AMS.DataModels;
 using AyuLanka.AMS.Repositories.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace AyuLanka.AMS.Repositories
@@ -16,6 +17,30 @@ namespace AyuLanka.AMS.Repositories
         {
             _context = context;
         }
+
+        // One flat mapping for the slim report rows, shared by the Appointment Report and the Missing Next Visit report.
+        // Treatment names are attached afterwards by AttachTreatmentTypesAsync (see there for why).
+        private static readonly Expression<Func<AppointmentSchedule, AppointmentReportDto>> ReportProjection = a => new AppointmentReportDto
+        {
+            Id = a.Id,
+            TokenNo = a.TokenNo,
+            ChitNo = a.ChitNo,
+            CustomerId = a.CustomerId,
+            CustomerName = a.CustomerName,
+            ContactNo = a.ContactNo,
+            EmployeeName = a.Employee != null ? a.Employee.CallingName : null,
+            SecondaryEmployeeName = a.SecondaryEmployee != null ? a.SecondaryEmployee.CallingName : null,
+            LocationName = a.Location != null ? a.Location.Name : null,
+            ScheduleDate = a.ScheduleDate,
+            FromTime = a.FromTime,
+            ToTime = a.ToTime,
+            ActualFromTime = a.ActualFromTime,
+            ActualToTime = a.ActualToTime,
+            Remarks = a.Remarks,
+            TokenIssueTime = a.TokenIssueTime,
+            EnteredByName = a.EnteredByEmployee != null ? a.EnteredByEmployee.CallingName : null,
+            EnteredDate = a.EnteredDate
+        };
 
         public async Task<IEnumerable<AppointmentSchedule>> GetAllAppointmentSchedulesAsync(int? companyId = null)
         {
@@ -606,7 +631,56 @@ namespace AyuLanka.AMS.Repositories
             return await query.OrderBy(a => a.TokenNo).ToListAsync();
         }
 
-        public async Task<IEnumerable<UnlinkedAppointmentDto>> GetUnlinkedAppointmentsAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        // Second, flat query for the treatment names of the rows we are returning. Projecting them as a collection
+        // makes EF join treatments and ORDER BY every key of every joined table, which is very slow on a large range.
+        private async Task AttachTreatmentTypesAsync(List<AppointmentReportDto> rows)
+        {
+            if (rows.Count == 0) return;
+
+            var ids = rows.Select(r => r.Id).ToList();
+            var treatments = await _context.AppoinmentTreatments.AsNoTracking()
+                .Where(t => ids.Contains(t.AppoinmentId))
+                .Select(t => new { t.AppoinmentId, t.TreatmentType.Name, t.TreatmentType.TreatmentShortCode })
+                .ToListAsync();
+
+            var byAppointment = treatments.ToLookup(t => t.AppoinmentId);
+            foreach (var row in rows)
+            {
+                var own = byAppointment[row.Id].ToList();
+                row.TreatmentTypes = own.Select(t => t.Name).ToList();
+                row.TreatmentShortCodes = own
+                    .Select(t => t.TreatmentShortCode?.Trim())
+                    .Where(code => !string.IsNullOrEmpty(code))
+                    .Select(code => code!)
+                    .Distinct()
+                    .ToList();
+            }
+        }
+
+        public async Task<IEnumerable<AppointmentReportDto>> GetAppointmentReportAsync(DateTime startDate, DateTime endDate, int? companyId = null)
+        {
+            var start = startDate.Date;
+            var end = endDate.Date.AddDays(1);
+
+            var query = _context.AppointmentSchedules.AsNoTracking()
+                .Where(a => a.ScheduleDate >= start && a.ScheduleDate < end)
+                .Where(a => a.IsDeleted != true)
+                .Where(a => a.Location != null);
+            if (companyId.HasValue)
+                query = query.Where(a => a.CompanyId == companyId.Value);
+
+            var rows = await query.Select(ReportProjection).ToListAsync();
+            await AttachTreatmentTypesAsync(rows);
+
+            // Sorted here, not in SQL: a sort over the joined rows is what made large ranges time out
+            return rows
+                .OrderBy(r => r.ScheduleDate)
+                .ThenBy(r => r.TokenNo == null)   // appointments without a token last
+                .ThenBy(r => r.TokenNo)
+                .ToList();
+        }
+
+        public async Task<IEnumerable<AppointmentReportDto>> GetUnlinkedAppointmentsAsync(DateTime startDate, DateTime endDate, int? companyId = null)
         {
             var start = startDate.Date;
             var end = endDate.Date.AddDays(1);
@@ -621,40 +695,16 @@ namespace AyuLanka.AMS.Repositories
                 .Where(a => a.ScheduleDate >= start && a.ScheduleDate < end &&
                     //!_context.AppointmentSchedules.Any(c => c.ParentAppointmentScheduleId == a.Id && c.IsDeleted != true))
                     !_context.AppointmentSchedules.Any(c => c.ParentAppointmentScheduleId == a.Id))
-                .OrderBy(a => a.ScheduleDate).ThenBy(a => a.TokenNo)
-                .Select(a => new UnlinkedAppointmentDto
-                {
-                    Id = a.Id,
-                    TokenNo = a.TokenNo,
-                    ChitNo = a.ChitNo,
-                    CustomerId = a.CustomerId,
-                    CustomerName = a.CustomerName,
-                    ContactNo = a.ContactNo,
-                    EmployeeName = a.Employee != null ? a.Employee.CallingName : null,
-                    SecondaryEmployeeName = a.SecondaryEmployee != null ? a.SecondaryEmployee.CallingName : null,
-                    LocationName = a.Location != null ? a.Location.Name : null,
-                    TreatmentTypes = a.AppointmentTreatments.Select(t => t.TreatmentType.Name).ToList(),
-                    ScheduleDate = a.ScheduleDate,
-                    FromTime = a.FromTime,
-                    ToTime = a.ToTime,
-                    ActualFromTime = a.ActualFromTime,
-                    ActualToTime = a.ActualToTime,
-                    Remarks = a.Remarks,
-                    TokenIssueTime = a.TokenIssueTime,
-                    EnteredByName = a.EnteredByEmployee != null ? a.EnteredByEmployee.CallingName : null,
-                    EnteredDate = a.EnteredDate
-                })
+                .Select(ReportProjection)
                 .ToListAsync();
 
             if (candidates.Count == 0) return candidates;
 
-            // 2) Every issued visit (any date) of those patients; keep a candidate only if it is the patient's latest
-            var customerIds = candidates.Where(c => c.CustomerId != null).Select(c => c.CustomerId!.Value).Distinct().ToList();
-            var contactNos = candidates.Where(c => c.CustomerId == null).Select(c => c.ContactNo).Distinct().ToList();
-
+            // 2) Issued visits from the range start onwards (nothing earlier can be later than a candidate); a candidate
+            // is kept only if it is its patient's latest. One flat query with no IN list: passing every candidate's
+            // customer id as a list made this step take over a minute on a wide range.
             var visits = await issued
-                .Where(b => (b.CustomerId != null && customerIds.Contains(b.CustomerId.Value)) ||
-                            (b.CustomerId == null && contactNos.Contains(b.ContactNo)))
+                .Where(b => b.ScheduleDate >= start)
                 .Select(b => new { b.Id, b.CustomerId, b.ContactNo, b.ScheduleDate })
                 .ToListAsync();
 
@@ -665,9 +715,13 @@ namespace AyuLanka.AMS.Repositories
                 .GroupBy(v => PatientKey(v.CustomerId, v.ContactNo))
                 .ToDictionary(g => g.Key, g => g.OrderByDescending(v => v.ScheduleDate).ThenByDescending(v => v.Id).First().Id);
 
-            return candidates
+            var result = candidates
                 .Where(c => latestVisitId.TryGetValue(PatientKey(c.CustomerId, c.ContactNo), out var id) && id == c.Id)
+                .OrderBy(c => c.ScheduleDate).ThenBy(c => c.TokenNo)
                 .ToList();
+
+            await AttachTreatmentTypesAsync(result);
+            return result;
         }
     }
 }
